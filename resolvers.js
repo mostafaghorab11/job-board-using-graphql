@@ -1,70 +1,43 @@
 import { PrismaClient } from '@prisma/client';
 
+import {
+  createCompany,
+  getAllCompanies,
+  getCompanyById,
+  getJobs,
+} from './db/companies.js';
+import { createJob, getAllJobs, getCompany, getJobById } from './db/jobs.js';
+
 const prisma = new PrismaClient();
 
 export const resolvers = {
   Query: {
-    jobs: async () => {
-      const jobs = await prisma.job.findMany();
-      return jobs;
-    },
+    jobs: async () => await getAllJobs(),
 
-    job: async (_, { id }) => {
-      id = +id;
-      const job = await prisma.job.findUnique({ where: { id } });
-      if (!job) {
-        throw new Error('No job found with that ID');
-      }
-      return job;
-    },
+    job: async (_, { id }) => await getJobById(+id),
 
-    companies: async () => {
-      const companies = await prisma.company.findMany();
-      return companies;
-    },
+    companies: async () => await getAllCompanies(),
 
-    company: async (_, { id }) => {
-      id = +id;
-      const company = await prisma.company.findUnique({ where: { id } });
-      if (!company) {
-        throw new Error('No company found with that ID');
-      }
-      return company;
-    }
+    company: async (_, { id }) => getCompanyById(+id),
   },
   Mutation: {
     createJob: async (_, { data }) => {
       const { title, description, companyId } = data;
-      if (!companyId) {
-        throw new Error('companyId is required to create a job');
-      }
-      return await prisma.job.create({
-        data: {
-          title,
-          description,
-          company: {
-            connect: {
-              id: +companyId,
-            },
-          },
-        },
-      });
+      return await createJob({ title, description, companyId });
     },
     createCompany: async (_, { data }) => {
       const { name, description } = data;
-      return await prisma.company.create({
-        data: {
-          name,
-          description,
-        },
-      });
+      return await createCompany({ name, description });
     },
   },
   Job: {
-    company: async (job, args, context) => {
-      return job
-        ? await prisma.job.findUnique({ where: { id: job.id } }).company()
-        : null;
+    company: async (job) => {
+      return job ? await getCompany(job.id) : null;
+    },
+  },
+  Company: {
+    jobs: async (company) => {
+      return company ? await getJobs(company.id) : null;
     },
   },
 };
