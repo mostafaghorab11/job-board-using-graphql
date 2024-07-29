@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { notFoundError } from '../utils/appError.js';
+import { NotFoundError } from '../utils/appError.js';
 
 const prisma = new PrismaClient();
 
@@ -29,7 +29,7 @@ export async function getAllJobs() {
 export async function getJobById(id) {
   const job = await prisma.job.findUnique({ where: { id } });
   if (!job) {
-    throw notFoundError('No job found with that ID');
+    throw NotFoundError('No job found with that ID');
   }
   return job;
 }
@@ -39,17 +39,20 @@ export async function getCompany(jobId) {
 }
 
 // write a function to delete jobs
-export async function deleteJob(jobId) {
-  const job = await prisma.job.findUnique({ where: { id: jobId } });
-  if (!job) throw notFoundError('Job not found');
+export async function deleteJob(jobId, { companyId }) {
+  const job = await prisma.job.findUnique({
+    where: { id: jobId, companyId },
+  });
+  if (!job) throw NotFoundError('Job not found');
   return await prisma.job.delete({ where: { id: jobId } });
 }
 
 // write a function to update jobs
 export async function updateJob(jobId, { title, description, companyId }) {
-  const existingJob = await prisma.job.findUnique({ where: { id: jobId } });
-  console.log(existingJob);
-  if (!existingJob) throw notFoundError('Job not found');
+  const existingJob = await prisma.job.findUnique({
+    where: { id: jobId, companyId },
+  });
+  if (!existingJob) throw NotFoundError('Job not found');
   return await prisma.job.update({
     where: { id: jobId },
     data: { title, description, company: { connect: { id: +companyId } } },

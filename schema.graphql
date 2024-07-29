@@ -44,5 +44,4 @@ input CreateCompanyInput {
 input UpdateJobInput {
   title: String
   description: String
-  companyId: ID
 }

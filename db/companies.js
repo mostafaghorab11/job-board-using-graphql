@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { notFoundError } from '../utils/appError.js';
+import { NotFoundError } from '../utils/appError.js';
 
 const prisma = new PrismaClient();
 
@@ -21,7 +21,7 @@ export async function getAllCompanies() {
 export async function getCompanyById(id) {
   const company = await prisma.company.findUnique({ where: { id } });
   if (!company) {
-    throw notFoundError('No company found with that ID');
+    throw NotFoundError('No company found with that ID');
   }
   return company;
 }
