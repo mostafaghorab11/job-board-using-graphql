@@ -37,3 +37,21 @@ export async function getJobById(id) {
 export async function getCompany(jobId) {
   return await prisma.job.findUnique({ where: { id: jobId } }).company();
 }
+
+// write a function to delete jobs
+export async function deleteJob(jobId) {
+  const job = await prisma.job.findUnique({ where: { id: jobId } });
+  if (!job) throw notFoundError('Job not found');
+  return await prisma.job.delete({ where: { id: jobId } });
+}
+
+// write a function to update jobs
+export async function updateJob(jobId, { title, description, companyId }) {
+  const existingJob = await prisma.job.findUnique({ where: { id: jobId } });
+  console.log(existingJob);
+  if (!existingJob) throw notFoundError('Job not found');
+  return await prisma.job.update({
+    where: { id: jobId },
+    data: { title, description, company: { connect: { id: +companyId } } },
+  });
+}

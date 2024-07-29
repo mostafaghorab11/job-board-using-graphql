@@ -1,14 +1,17 @@
-import { PrismaClient } from '@prisma/client';
-
 import {
   createCompany,
   getAllCompanies,
   getCompanyById,
   getJobs,
 } from './db/companies.js';
-import { createJob, getAllJobs, getCompany, getJobById } from './db/jobs.js';
-
-const prisma = new PrismaClient();
+import {
+  createJob,
+  deleteJob,
+  getAllJobs,
+  getCompany,
+  getJobById,
+  updateJob,
+} from './db/jobs.js';
 
 export const resolvers = {
   Query: {
@@ -21,13 +24,16 @@ export const resolvers = {
     company: async (_, { id }) => getCompanyById(+id),
   },
   Mutation: {
-    createJob: async (_, { data }) => {
-      const { title, description, companyId } = data;
+    createJob: async (_, { input: { title, description, companyId } }) => {
       return await createJob({ title, description, companyId });
     },
-    createCompany: async (_, { data }) => {
-      const { name, description } = data;
+    createCompany: async (_, { input: { name, description } }) => {
       return await createCompany({ name, description });
+    },
+    deleteJob: async (_, { id }) => await deleteJob(+id),
+
+    updateJob: async (_, { id, input: { title, description, companyId } }) => {
+      return await updateJob(+id, { title, description, companyId });
     },
   },
   Job: {
