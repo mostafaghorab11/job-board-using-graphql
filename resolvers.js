@@ -2,9 +2,9 @@ import {
   createCompany,
   getAllCompanies,
   getCompanyById,
-  // getJobs,
 } from './db/companies.js';
 import {
+  countAllJobs,
   createJob,
   deleteJob,
   getAllJobs,
@@ -16,7 +16,11 @@ import { UnauthorizedError } from './utils/appError.js';
 
 export const resolvers = {
   Query: {
-    jobs: async () => await getAllJobs(),
+    jobs: async (_, { limit, page }) => {
+      const jobs = await getAllJobs(limit, page);
+      const totalCount = await countAllJobs();
+      return { totalCount, jobs };
+    },
 
     job: async (_, { id }) => await getJobById(+id),
 

@@ -17,18 +17,25 @@ export async function createJob({ title, description, companyId }) {
         },
       },
     },
+    include: { company: true },
   });
 }
 
-export async function getAllJobs() {
+export async function getAllJobs(limit, page) {
+  const skip = (page - 1) * limit;
   return await prisma.job.findMany({
     include: {
       company: true,
     },
+    orderBy: [{ createdAt: 'asc' }],
+    take: limit,
+    skip: skip ? skip : 0,
   });
 }
 
-// export async function getAll()
+export async function countAllJobs() {
+  return await prisma.job.count();
+}
 
 export async function getJobById(id) {
   const job = await prisma.job.findUnique({
