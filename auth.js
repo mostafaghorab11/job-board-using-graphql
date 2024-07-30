@@ -8,6 +8,7 @@ export const authMiddleware = expressjwt({
   algorithms: ['HS256'],
   credentialsRequired: false,
   secret,
+  expiresIn: '7d',
 });
 
 export async function handleLogin(req, res) {
@@ -18,6 +19,6 @@ export async function handleLogin(req, res) {
   } else {
     const claims = { sub: user.id, email: user.email };
     const token = jwt.sign(claims, secret);
-    res.json({ token });  
+    res.json({ token });
   }
 }

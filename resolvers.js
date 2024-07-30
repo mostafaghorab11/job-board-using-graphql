@@ -2,13 +2,13 @@ import {
   createCompany,
   getAllCompanies,
   getCompanyById,
-  getJobs,
+  // getJobs,
 } from './db/companies.js';
 import {
   createJob,
   deleteJob,
   getAllJobs,
-  getCompany,
+  // getCompany,
   getJobById,
   updateJob,
 } from './db/jobs.js';
@@ -42,7 +42,6 @@ export const resolvers = {
     },
 
     updateJob: async (_, { id, input: { title, description } }, { user }) => {
-      console.log(id, title, description, user);
       if (!user) return UnauthorizedError('Please login to update a job');
       return await updateJob(+id, {
         title,
@@ -52,15 +51,15 @@ export const resolvers = {
     },
   },
 
-  Job: {
-    company: async (job) => {
-      return job ? await getCompany(job.id) : null;
-    },
-  },
+  // Job: {
+  //   company: async (job) => {
+  //     return job ? await getCompany(job.id) : null;
+  //   },
+  // },
 
-  Company: {
-    jobs: async (company) => {
-      return company ? await getJobs(company.id) : null;
-    },
-  },
+  // Company: {
+  //   jobs: async (company) => {
+  //     return company ? await getJobs(company.id) : null;
+  //   },
+  // },
 };

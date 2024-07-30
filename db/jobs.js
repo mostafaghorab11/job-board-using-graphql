@@ -21,24 +21,32 @@ export async function createJob({ title, description, companyId }) {
 }
 
 export async function getAllJobs() {
-  return await prisma.job.findMany();
+  return await prisma.job.findMany({
+    include: {
+      company: true,
+    },
+  });
 }
 
 // export async function getAll()
 
 export async function getJobById(id) {
-  const job = await prisma.job.findUnique({ where: { id } });
+  const job = await prisma.job.findUnique({
+    where: { id },
+    include: { company: true },
+  });
   if (!job) {
     throw NotFoundError('No job found with that ID');
   }
   return job;
 }
 
-export async function getCompany(jobId) {
-  return await prisma.job.findUnique({ where: { id: jobId } }).company();
-}
+// we removed it and used include instead to avoid N+1 query problem
 
-// write a function to delete jobs
+// export async function getCompany(jobId) {
+//   return await prisma.job.findUnique({ where: { id: jobId } }).company();
+// }
+
 export async function deleteJob(jobId, { companyId }) {
   const job = await prisma.job.findUnique({
     where: { id: jobId, companyId },
@@ -47,7 +55,6 @@ export async function deleteJob(jobId, { companyId }) {
   return await prisma.job.delete({ where: { id: jobId } });
 }
 
-// write a function to update jobs
 export async function updateJob(jobId, { title, description, companyId }) {
   const existingJob = await prisma.job.findUnique({
     where: { id: jobId, companyId },
@@ -56,5 +63,6 @@ export async function updateJob(jobId, { title, description, companyId }) {
   return await prisma.job.update({
     where: { id: jobId },
     data: { title, description, company: { connect: { id: +companyId } } },
+    include: { company: true },
   });
 }

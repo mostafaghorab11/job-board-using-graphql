@@ -13,21 +13,26 @@ export async function createCompany({ name, description }) {
 }
 
 export async function getAllCompanies() {
-  return await prisma.company.findMany();
+  return await prisma.company.findMany({
+    include: {
+      jobs: true,
+    },
+  });
 }
 
-// export async function getAll()
-
 export async function getCompanyById(id) {
-  const company = await prisma.company.findUnique({ where: { id } });
+  const company = await prisma.company.findUnique({
+    where: { id },
+    include: { jobs: true },
+  });
   if (!company) {
     throw NotFoundError('No company found with that ID');
   }
   return company;
 }
 
-export async function getJobs(companyId) {
-  return await prisma.company
-    .findUnique({ where: { id: companyId } })
-    .jobs();
-}
+// export async function getJobs(companyId) {
+//   return await prisma.company
+//     .findUnique({ where: { id: companyId } })
+//     .jobs();
+// }
